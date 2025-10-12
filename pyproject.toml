@@ -1,0 +1,9 @@
+[project]
+name = "LicenseGuard-MCP"
+version = "0.1.0"
+description = "A MCP server that wraps around the backend server"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp[cli]>=1.17.0",
+]

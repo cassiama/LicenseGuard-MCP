@@ -1,0 +1,18 @@
+# sensitive files (don't be dumb!)
+.env
+
+# build artifacts
+dist/
+build/
+*.egg-info/
+
+# Python folders
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# VSCode-related folders
+.devcontainer/
+.vscode/
+*.code-workspace
