@@ -1,7 +1,5 @@
 import os
 import httpx
-from typing import Any
-from secrets import token_hex
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from mcp.server.fastmcp import FastMCP
@@ -35,13 +33,13 @@ def analyze_dependencies(
     user_token: str
 ):
     # validate the project name according to the 'DependencyReport' schema (see LicenseGuard-API)
-    assert type(project_name) == str, "The project name must be of type string."
+    assert isinstance(project_name, str), "The project name must be of type string."
     if len(project_name) < 1 or len(project_name) > 100:
         raise RuntimeError("Project name must be between 1 and 100 characters.")
 
     # validate the requirements.txt content
-    assert type(
-        requirements_content) == str, "The 'requirements.txt' file must be of type string."
+    assert isinstance(
+        requirements_content, str), "The 'requirements.txt' file must be of type string."
 
     # "create" the requirements.txt file for the POST request to the backend
     requirements_file = (

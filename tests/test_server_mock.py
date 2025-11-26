@@ -169,7 +169,7 @@ class TestAnalyzeDependenciesMocked(unittest.TestCase):
         mock_response.json.return_value = {"detail": "Invalid request format"}
         
         # Configure raise_for_status to raise an HTTPStatusError
-        from httpx import HTTPStatusError, Request, Response
+        from httpx import HTTPStatusError, Request
         mock_request = Mock(spec=Request)
         mock_request.url = "http://localhost:5000/analyze"
         
