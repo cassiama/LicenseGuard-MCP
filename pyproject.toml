@@ -10,3 +10,8 @@ dependencies = [
     "mcp[cli]>=1.17.0",
     "pytest>=8.4.2",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.6",
+]
