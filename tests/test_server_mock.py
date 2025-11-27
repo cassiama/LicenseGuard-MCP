@@ -10,6 +10,10 @@ from unittest.mock import Mock, patch, MagicMock
 import os
 import sys
 
+# Set environment variables for the test
+os.environ["BACKEND_URL_HOST"] = "http://localhost"
+os.environ["BACKEND_URL_PORT"] = "5000"
+
 # Add parent directory to path to import server module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -21,9 +25,6 @@ class TestAnalyzeDependenciesMocked(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures before each test method."""
-        # Set environment variables for the test
-        os.environ['BACKEND_URL_HOST'] = 'http://localhost'
-        os.environ['BACKEND_URL_PORT'] = '5000'
         
         # Sample test data
         self.project_name = "test-project"
