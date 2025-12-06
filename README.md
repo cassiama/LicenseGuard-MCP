@@ -58,3 +58,4 @@ Run the Docker image by running `docker run -p 8000:8000 --env-file .env license
 Run the Docker image by running `docker run -p 8000:8000 -e BACKEND_URL_HOST=http://localhost -e BACKEND_URL_PORT=80 licenseguard/license-guard:mcp-latest` in the terminal.
 
 Once you get the server running, you can access all of the MCP-related resources at `http://localhost:8000/mcp`.
+
