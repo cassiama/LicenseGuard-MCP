@@ -82,7 +82,6 @@ def analyze_dependencies(
 
 
 if __name__ == "__main__":
-    # print("🚀 Starting the MCP server...")
     mcp.run(
         transport="streamable-http",
     )
