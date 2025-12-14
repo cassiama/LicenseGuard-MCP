@@ -10,7 +10,7 @@ import pytest
 import httpx
 
 # add parent directory to path in order to import server module
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # we must set environment variables BEFORE importing server module so that the module-level os.getenv() calls in server.py get the correct values
 os.environ["BACKEND_URL_HOST"] = "http://localhost"
@@ -29,7 +29,9 @@ class FakeRequest:
 class FakeResponse:
     """Fake `httpx.Response` for testing."""
 
-    def __init__(self, json_data, status_code=200, should_raise=False, error_detail=None):
+    def __init__(
+        self, json_data, status_code=200, should_raise=False, error_detail=None
+    ):
         self._json_data = json_data
         self.status_code = status_code
         self._should_raise = should_raise
@@ -45,8 +47,8 @@ class FakeResponse:
         if self._should_raise:
             raise httpx.HTTPStatusError(
                 "Bad Request" if self.status_code == 400 else "Error",
-                request=self.request,
-                response=self
+                request=self.request,  # type: ignore
+                response=self,  # type: ignore
             )
 
 
@@ -80,15 +82,15 @@ def mock_response_data():
                 "name": "requests",
                 "version": "2.28.0",
                 "license": "Apache-2.0",
-                "confidence": 0.9
+                "confidence": 0.9,
             },
             {
                 "name": "flask",
                 "version": "2.3.0",
                 "license": "BSD-3-Clause",
-                "confidence": 0.9
-            }
-        ]
+                "confidence": 0.9,
+            },
+        ],
     }
 
 
@@ -98,7 +100,7 @@ def test_inputs():
     return {
         "project_name": "test-project",
         "requirements_content": "requests==2.28.0\nflask==2.3.0",
-        "user_token": "test-token-12345"
+        "user_token": "test-token-12345",
     }
 
 
@@ -113,21 +115,21 @@ def complex_response_data():
                 "name": "numpy",
                 "version": "1.24.0",
                 "license": "BSD-3-Clause",
-                "confidence": 0.99
+                "confidence": 0.99,
             },
             {
                 "name": "pandas",
                 "version": "2.0.0",
                 "license": "BSD-3-Clause",
-                "confidence": 0.97
+                "confidence": 0.97,
             },
             {
                 "name": "matplotlib",
                 "version": "3.7.0",
                 "license": "PSF",
-                "confidence": 0.92
-            }
-        ]
+                "confidence": 0.92,
+            },
+        ],
     }
 
 
@@ -152,7 +154,7 @@ def test_analyze_dependencies_success(monkeypatch, mock_response_data, test_inpu
     result = analyze_dependencies(
         project_name=test_inputs["project_name"],
         requirements_content=test_inputs["requirements_content"],
-        user_token=test_inputs["user_token"]
+        user_token=test_inputs["user_token"],
     )
 
     # verify the result matches our mock response
@@ -194,19 +196,23 @@ def test_analyze_dependencies_validates_project_name(monkeypatch):
     monkeypatch.setattr("server.httpx.Client", lambda: fake_client)
 
     # test when project name is empty
-    with pytest.raises(RuntimeError, match="Project name must be between 1 and 100 characters"):
+    with pytest.raises(
+        RuntimeError, match="Project name must be between 1 and 100 characters"
+    ):
         analyze_dependencies(
             project_name="",
             requirements_content="requests==2.28.0",
-            user_token="test-token"
+            user_token="test-token",
         )
 
     # test when the project name is too long
-    with pytest.raises(RuntimeError, match="Project name must be between 1 and 100 characters"):
+    with pytest.raises(
+        RuntimeError, match="Project name must be between 1 and 100 characters"
+    ):
         analyze_dependencies(
             project_name="a" * 101,
             requirements_content="requests==2.28.0",
-            user_token="test-token"
+            user_token="test-token",
         )
 
     # verify no HTTP calls were made due to validation failure
@@ -221,11 +227,13 @@ def test_analyze_dependencies_validates_requirements_type(monkeypatch):
     fake_client = FakeClient(FakeResponse({}))
     monkeypatch.setattr("server.httpx.Client", lambda: fake_client)
 
-    with pytest.raises(AssertionError, match="'requirements.txt' file must be of type string"):
+    with pytest.raises(
+        AssertionError, match="'requirements.txt' file must be of type string"
+    ):
         analyze_dependencies(
             project_name="test-project",
             requirements_content=123,  # invalid type
-            user_token="test-token"
+            user_token="test-token",
         )
 
     # verify no HTTP calls were made
@@ -243,27 +251,28 @@ def test_analyze_dependencies_handles_http_error(monkeypatch, test_inputs):
         json_data={},
         status_code=400,
         should_raise=True,
-        error_detail="Invalid request format"
+        error_detail="Invalid request format",
     )
     fake_client = FakeClient(fake_response)
 
     monkeypatch.setattr("server.httpx.Client", lambda: fake_client)
 
-    # call the analyze_dependencies tool and expect a RuntimeError
-    with pytest.raises(RuntimeError) as exc_info:
-        analyze_dependencies(
-            project_name=test_inputs["project_name"],
-            requirements_content=test_inputs["requirements_content"],
-            user_token=test_inputs["user_token"]
-        )
+    # call the analyze_dependencies tool and assert the function returns the error message string
+    result = analyze_dependencies(
+        project_name=test_inputs["project_name"],
+        requirements_content=test_inputs["requirements_content"],
+        user_token=test_inputs["user_token"],
+    )
 
     # verify the error message contains the status code and detail
-    error_message = str(exc_info.value)
+    error_message = str(result)
     assert "400" in error_message
     assert "Invalid request format" in error_message
 
 
-def test_analyze_dependencies_no_internet_required(monkeypatch, mock_response_data, test_inputs):
+def test_analyze_dependencies_no_internet_required(
+    monkeypatch, mock_response_data, test_inputs
+):
     """
     Test that the test suite can run without internet connectivity.
 
@@ -279,7 +288,7 @@ def test_analyze_dependencies_no_internet_required(monkeypatch, mock_response_da
     result = analyze_dependencies(
         project_name=test_inputs["project_name"],
         requirements_content=test_inputs["requirements_content"],
-        user_token=test_inputs["user_token"]
+        user_token=test_inputs["user_token"],
     )
 
     # verify we got a result without making real HTTP calls
@@ -290,7 +299,9 @@ def test_analyze_dependencies_no_internet_required(monkeypatch, mock_response_da
     assert len(fake_client.post_calls) == 1
 
 
-def test_analyze_dependencies_parses_response_correctly(monkeypatch, complex_response_data):
+def test_analyze_dependencies_parses_response_correctly(
+    monkeypatch, complex_response_data
+):
     """
     Test that the MCP server correctly parses the backend response.
 
@@ -306,7 +317,7 @@ def test_analyze_dependencies_parses_response_correctly(monkeypatch, complex_res
     result = analyze_dependencies(
         project_name="complex-project",
         requirements_content="numpy==1.24.0\npandas==2.0.0\nmatplotlib==3.7.0",
-        user_token="test-token"
+        user_token="test-token",
     )
 
     # verify complete parsing
